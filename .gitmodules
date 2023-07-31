@@ -1,0 +1,9 @@
+[submodule "aklomp-base64"]
+	path = aklomp-base64
+	url = https://github.com/aklomp/base64
+[submodule "Turbo-Base64"]
+	path = Turbo-Base64
+	url = https://github.com/powturbo/Turbo-Base64
+[submodule "benchmark"]
+	path = benchmark
+	url = https://github.com/google/benchmark
