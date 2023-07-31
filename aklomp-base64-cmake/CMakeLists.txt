@@ -54,12 +54,13 @@ if (ARCH_AMD64)
     macro(configure_codec _TYPE)
         if (BASE64_WITH_${_TYPE})
             string(TOLOWER "${_TYPE}" _DIR)
-            set_source_files_properties("lib/arch/${_DIR}/codec.c" PROPERTIES
+            message(STATUS "Will add ${_TYPE} codepath")
+            set_source_files_properties("${LIBRARY_DIR}/lib/arch/${_DIR}/codec.c" PROPERTIES
                 COMPILE_FLAGS "${COMPILE_FLAGS_${_TYPE}}"
             )
 
             if (${ARGC} GREATER 1 AND MSVC)
-                set_source_files_properties("lib/arch/${_DIR}/codec.c" PROPERTIES
+                set_source_files_properties("${LIBRARY_DIR}/lib/arch/${_DIR}/codec.c" PROPERTIES
                     COMPILE_DEFINITIONS ${ARGV1}
                 )
             endif()
@@ -81,8 +82,6 @@ elseif (_TARGET_ARCH STREQUAL "arm")
             COMPILE_FLAGS "${BASE64_NEON32_CFLAGS} "
         )
     endif()
-
-#elseif (_TARGET_ARCH STREQUAL "arm64" AND BASE64_WITH_NEON64)
 
 endif()
 
