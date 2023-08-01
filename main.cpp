@@ -53,6 +53,7 @@ static void BM_TurboBase64Encode(benchmark::State & state)
 #else
         _tb64e(reinterpret_cast<const uint8_t *>(input.data()), size, reinterpret_cast<uint8_t *>(output.data()));
 #endif
+        benchmark::DoNotOptimize(output);
     }
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
@@ -72,6 +73,7 @@ static void BM_TurboBase64Decode(benchmark::State & state)
 #else
         _tb64d(reinterpret_cast<const uint8_t *>(input.data()), size, reinterpret_cast<uint8_t *>(output.data()));
 #endif
+        benchmark::DoNotOptimize(output);
     }
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
@@ -88,6 +90,7 @@ static void BM_AklompBase64Encode(benchmark::State & state)
     for ([[maybe_unused]] auto iteration : state)
     {
         base64_encode(input.data(), size, output.data(), &outlen, 0);
+        benchmark::DoNotOptimize(output);
     }
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
@@ -104,6 +107,7 @@ static void BM_AklompBase64Decode(benchmark::State & state)
     for ([[maybe_unused]] auto iteration : state)
     {
         base64_decode(input.data(), size, output.data(), &outlen, 0);
+        benchmark::DoNotOptimize(output);
     }
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
