@@ -7,83 +7,148 @@ This repository compares the performance between the following base64 implementa
 
 To measure the performance, [Google Benchmark](https://github.com/google/benchmark) is used.
 
-## Results
+The data is taken from ClickBench `hits.tsv.gz` file, namely `SearchPhrase`, `URL` and `Title` columns.
+Queries used:
+```sql
+select top 1 SearchPhrase from hits where lengthUTF8(SearchPhrase) = 50 format CSV;
+select top 1 URL from hits where lengthUTF8(URL) = 50 format CSV;
+select top 1 Title from hits where lengthUTF8(Title) = 50 format CSV;
 
-Macbook Pro, M1 Max, 64GB RAM, macOS Ventura 13.4.1, LLVM Clang 16.
+select top 1 SearchPhrase from hits where lengthUTF8(SearchPhrase) = 100 format CSV;
+select top 1 URL from hits where lengthUTF8(URL) = 100 format CSV;
+select top 1 Title from hits where lengthUTF8(Title) = 100 format CSV;
 
-Encoding:
+select top 1 SearchPhrase from hits where lengthUTF8(SearchPhrase) = 200 format CSV;
+select top 1 URL from hits where lengthUTF8(URL) = 200 format CSV;
+select top 1 Title from hits where lengthUTF8(Title) = 200 format CSV;
 
-```
------------------------------------------------------------------------------------
-Benchmark                         Time             CPU   Iterations UserCounters...
------------------------------------------------------------------------------------
-BM_TurboBase64Encode/0         25.2 ns         25.2 ns     27747388 bytes_per_second=3.51387G/s size=95
-BM_TurboBase64Encode/1         14.2 ns         14.1 ns     50062936 bytes_per_second=3.30759G/s size=50
-BM_TurboBase64Encode/2         21.1 ns         21.1 ns     33426450 bytes_per_second=3.49336G/s size=79
-BM_TurboBase64Encode/3         29.7 ns         29.6 ns     23769181 bytes_per_second=3.77086G/s size=120
-BM_TurboBase64Encode/4         24.3 ns         24.3 ns     28608912 bytes_per_second=3.83553G/s size=100
-BM_TurboBase64Encode/5         34.4 ns         34.4 ns     20411377 bytes_per_second=3.76657G/s size=139
-BM_TurboBase64Encode/6         85.9 ns         85.8 ns      8198353 bytes_per_second=3.93016G/s size=362
-BM_TurboBase64Encode/7         47.3 ns         47.3 ns     14758872 bytes_per_second=3.94145G/s size=200
-BM_TurboBase64Encode/8         56.3 ns         56.2 ns     12385435 bytes_per_second=3.89202G/s size=235
-BM_TurboBase64Encode/9          209 ns          209 ns      3342422 bytes_per_second=4.03915G/s size=907
-BM_TurboBase64Encode/10         118 ns          118 ns      5927381 bytes_per_second=4.02124G/s size=511
-BM_TurboBase64Encode/11         200 ns          199 ns      3536461 bytes_per_second=4.00005G/s size=856
-BM_TurboBase64Encode/12         444 ns          444 ns      1580217 bytes_per_second=4.0716G/s size=1.94k
-BM_TurboBase64Encode/13        1774 ns         1773 ns       395061 bytes_per_second=4.08122G/s size=7.77k
-BM_TurboBase64Encode/14         456 ns          455 ns      1535401 bytes_per_second=4.0586G/s size=1.985k
-BM_AklompBase64Encode/0        17.2 ns         17.1 ns     40876390 bytes_per_second=5.15915G/s size=95
-BM_AklompBase64Encode/1        8.26 ns         8.25 ns     85105348 bytes_per_second=5.64187G/s size=50
-BM_AklompBase64Encode/2        15.3 ns         15.3 ns     45419449 bytes_per_second=4.82274G/s size=79
-BM_AklompBase64Encode/3        16.1 ns         16.1 ns     43385830 bytes_per_second=6.92703G/s size=120
-BM_AklompBase64Encode/4        12.3 ns         12.3 ns     56895305 bytes_per_second=7.60002G/s size=100
-BM_AklompBase64Encode/5        20.1 ns         20.0 ns     35157506 bytes_per_second=6.45727G/s size=139
-BM_AklompBase64Encode/6        28.0 ns         28.0 ns     24982423 bytes_per_second=12.0536G/s size=362
-BM_AklompBase64Encode/7        17.8 ns         17.5 ns     40295887 bytes_per_second=10.6244G/s size=200
-BM_AklompBase64Encode/8        25.1 ns         25.1 ns     27899895 bytes_per_second=8.72453G/s size=235
-BM_AklompBase64Encode/9        59.1 ns         59.0 ns     11758185 bytes_per_second=14.3091G/s size=907
-BM_AklompBase64Encode/10       37.4 ns         37.4 ns     18674037 bytes_per_second=12.7407G/s size=511
-BM_AklompBase64Encode/11       55.1 ns         55.1 ns     12692196 bytes_per_second=14.4769G/s size=856
-BM_AklompBase64Encode/12        109 ns          108 ns      6482802 bytes_per_second=16.7089G/s size=1.94k
-BM_AklompBase64Encode/13        418 ns          417 ns      1680975 bytes_per_second=17.3402G/s size=7.77k
-BM_AklompBase64Encode/14        110 ns          110 ns      6329228 bytes_per_second=16.8091G/s size=1.985k
+select top 1 SearchPhrase from hits where lengthUTF8(SearchPhrase) = 500 format CSV;
+select top 1 URL from hits where lengthUTF8(URL) = 500 format CSV;
+select top 1 Title from hits where lengthUTF8(Title) = 500 format CSV;
+
+select top 1 SearchPhrase from hits order by length(SearchPhrase) desc format CSV;
+select top 1 URL from hits order by length(URL) desc format CSV;
+select top 1 Title from hits order by length(Title) desc format CSV;
 ```
 
-Decoding:
+For encoded data, `base64Encode` was called to the resulted strings.
+
+# Results
+
+## Macbook Pro, M1 Max, 64GB RAM, macOS Ventura 13.4.1, LLVM Clang 16
+
+### Encoding
+
+#### ~50 symbols
+
 ```
------------------------------------------------------------------------------------
-Benchmark                         Time             CPU   Iterations UserCounters...
------------------------------------------------------------------------------------
-BM_TurboBase64Decode/0         27.3 ns         27.2 ns     25696183 bytes_per_second=4.37673G/s size=128
-BM_TurboBase64Decode/1         16.0 ns         16.0 ns     43657501 bytes_per_second=3.94982G/s size=68
-BM_TurboBase64Decode/2         24.4 ns         24.2 ns     29164965 bytes_per_second=4.15012G/s size=108
-BM_TurboBase64Decode/3         32.5 ns         32.4 ns     21601338 bytes_per_second=4.59355G/s size=160
-BM_TurboBase64Decode/4         27.7 ns         27.7 ns     25331756 bytes_per_second=4.58061G/s size=136
-BM_TurboBase64Decode/5         38.6 ns         38.6 ns     18236385 bytes_per_second=4.53856G/s size=188
-BM_TurboBase64Decode/6         92.2 ns         92.2 ns      7618053 bytes_per_second=4.89052G/s size=484
-BM_TurboBase64Decode/7         52.4 ns         52.1 ns     13284497 bytes_per_second=4.78792G/s size=268
-BM_TurboBase64Decode/8         61.6 ns         61.5 ns     11201613 bytes_per_second=4.78315G/s size=316
-BM_TurboBase64Decode/9          224 ns          224 ns      3137297 bytes_per_second=5.04861G/s size=1.212k
-BM_TurboBase64Decode/10         128 ns          127 ns      5499686 bytes_per_second=4.99914G/s size=684
-BM_TurboBase64Decode/11         212 ns          212 ns      3305286 bytes_per_second=5.03056G/s size=1.144k
-BM_TurboBase64Decode/12         485 ns          485 ns      1447651 bytes_per_second=4.97271G/s size=2.588k
-BM_TurboBase64Decode/13        1894 ns         1893 ns       371054 bytes_per_second=5.0969G/s size=10.36k
-BM_TurboBase64Decode/14         482 ns          482 ns      1453709 bytes_per_second=5.11869G/s size=2.648k
-BM_AklompBase64Decode/0        27.2 ns         27.1 ns     25837123 bytes_per_second=4.39823G/s size=128
-BM_AklompBase64Decode/1        11.1 ns         11.1 ns     63287706 bytes_per_second=5.71758G/s size=68
-BM_AklompBase64Decode/2        19.3 ns         19.3 ns     36370060 bytes_per_second=5.21357G/s size=108
-BM_AklompBase64Decode/3        22.3 ns         22.3 ns     31543183 bytes_per_second=6.69236G/s size=160
-BM_AklompBase64Decode/4        17.1 ns         17.1 ns     41042720 bytes_per_second=7.40691G/s size=136
-BM_AklompBase64Decode/5        27.3 ns         27.2 ns     25657285 bytes_per_second=6.42848G/s size=188
-BM_AklompBase64Decode/6        47.1 ns         47.0 ns     14978196 bytes_per_second=9.59017G/s size=484
-BM_AklompBase64Decode/7        27.8 ns         27.8 ns     25233409 bytes_per_second=8.97312G/s size=268
-BM_AklompBase64Decode/8        37.5 ns         37.4 ns     18784483 bytes_per_second=7.87169G/s size=316
-BM_AklompBase64Decode/9         105 ns          105 ns      6680090 bytes_per_second=10.7375G/s size=1.212k
-BM_AklompBase64Decode/10       62.8 ns         62.7 ns     11174968 bytes_per_second=10.1519G/s size=684
-BM_AklompBase64Decode/11       99.6 ns         99.5 ns      7037510 bytes_per_second=10.7045G/s size=1.144k
-BM_AklompBase64Decode/12        214 ns          214 ns      3276678 bytes_per_second=11.2691G/s size=2.588k
-BM_AklompBase64Decode/13        828 ns          820 ns       860469 bytes_per_second=11.7596G/s size=10.36k
-BM_AklompBase64Decode/14        209 ns          209 ns      3342932 bytes_per_second=11.788G/s size=2.648k
+Turbo-Base64 encode ~50 symbols/0                   25.1 ns         25.0 ns     28152134 bytes_per_second=3.53444G/s size=95
+Turbo-Base64 encode ~50 symbols/1                   13.9 ns         13.9 ns     50373483 bytes_per_second=3.35817G/s size=50
+Turbo-Base64 encode ~50 symbols/2                   21.0 ns         20.9 ns     33403162 bytes_per_second=3.51594G/s size=79
+aklomp/base64 encode ~50 symbols/0                  16.9 ns         16.9 ns     41439489 bytes_per_second=5.22632G/s size=95
+aklomp/base64 encode ~50 symbols/1                  8.19 ns         8.18 ns     85883248 bytes_per_second=5.69261G/s size=50
+aklomp/base64 encode ~50 symbols/2                  15.2 ns         15.2 ns     46147964 bytes_per_second=4.85347G/s size=79
+```
+
+#### ~100 symbols
+
+```
+Turbo-Base64 encode ~100 symbols/3                  29.1 ns         29.1 ns     24013887 bytes_per_second=3.83841G/s size=120
+Turbo-Base64 encode ~100 symbols/4                  23.9 ns         23.9 ns     29143352 bytes_per_second=3.89639G/s size=100
+Turbo-Base64 encode ~100 symbols/5                  33.9 ns         33.9 ns     20619832 bytes_per_second=3.82186G/s size=139
+aklomp/base64 encode ~100 symbols/3                 16.0 ns         16.0 ns     43696472 bytes_per_second=6.97524G/s size=120
+aklomp/base64 encode ~100 symbols/4                 12.3 ns         12.3 ns     56974028 bytes_per_second=7.57583G/s size=100
+aklomp/base64 encode ~100 symbols/5                 19.8 ns         19.8 ns     35334976 bytes_per_second=6.54421G/s size=139
+```
+
+#### ~200 symbols
+
+```
+Turbo-Base64 encode ~200 symbols/6                  84.6 ns         84.5 ns      8237135 bytes_per_second=3.98909G/s size=362
+Turbo-Base64 encode ~200 symbols/7                  46.7 ns         46.6 ns     14992504 bytes_per_second=3.99288G/s size=200
+Turbo-Base64 encode ~200 symbols/8                  55.3 ns         55.3 ns     12564393 bytes_per_second=3.95652G/s size=235
+aklomp/base64 encode ~200 symbols/6                 27.7 ns         27.7 ns     25270211 bytes_per_second=12.1742G/s size=362
+aklomp/base64 encode ~200 symbols/7                 17.3 ns         17.3 ns     40447932 bytes_per_second=10.7827G/s size=200
+aklomp/base64 encode ~200 symbols/8                 25.0 ns         24.9 ns     28196359 bytes_per_second=8.77668G/s size=235
+```
+
+#### ~500 symbols
+
+```
+Turbo-Base64 encode ~500 symbols/9                   206 ns          206 ns      3386272 bytes_per_second=4.10356G/s size=907
+Turbo-Base64 encode ~500 symbols/10                  117 ns          117 ns      6009770 bytes_per_second=4.07072G/s size=511
+Turbo-Base64 encode ~500 symbols/11                  196 ns          196 ns      3567352 bytes_per_second=4.0712G/s size=856
+aklomp/base64 encode ~500 symbols/9                 58.6 ns         58.5 ns     12024805 bytes_per_second=14.43G/s size=907
+aklomp/base64 encode ~500 symbols/10                37.0 ns         37.0 ns     18963612 bytes_per_second=12.8774G/s size=511
+aklomp/base64 encode ~500 symbols/11                54.5 ns         54.5 ns     12830853 bytes_per_second=14.6273G/s size=856
+```
+
+#### Longest strings in ClickBench
+
+```
+Turbo-Base64 encode longest in ClickBench/12         440 ns          440 ns      1590327 bytes_per_second=4.10882G/s size=1.94k
+Turbo-Base64 encode longest in ClickBench/13        1754 ns         1752 ns       400364 bytes_per_second=4.12949G/s size=7.77k
+Turbo-Base64 encode longest in ClickBench/14         449 ns          448 ns      1558791 bytes_per_second=4.12445G/s size=1.985k
+aklomp/base64 encode longest in ClickBench/12        107 ns          107 ns      6537718 bytes_per_second=16.8643G/s size=1.94k
+aklomp/base64 encode longest in ClickBench/13        415 ns          415 ns      1693320 bytes_per_second=17.4508G/s size=7.77k
+aklomp/base64 encode longest in ClickBench/14        109 ns          109 ns      6424258 bytes_per_second=16.967G/s size=1.985k
+```
+
+### Decoding
+
+#### ~50 symbols
+
+```
+Turbo-Base64 decode ~50 symbols/0                   27.1 ns         27.1 ns     25814636 bytes_per_second=4.40107G/s size=128
+Turbo-Base64 decode ~50 symbols/1                   15.8 ns         15.8 ns     44117554 bytes_per_second=4.00012G/s size=68
+Turbo-Base64 decode ~50 symbols/2                   23.7 ns         23.7 ns     29478897 bytes_per_second=4.24605G/s size=108
+aklomp/base64 decode ~50 symbols/0                  26.9 ns         26.9 ns     26081546 bytes_per_second=4.43335G/s size=128
+aklomp/base64 decode ~50 symbols/1                  11.0 ns         11.0 ns     64077332 bytes_per_second=5.77292G/s size=68
+aklomp/base64 decode ~50 symbols/2                  19.2 ns         19.1 ns     36761810 bytes_per_second=5.25604G/s size=108
+```
+
+#### ~100 symbols
+
+```
+Turbo-Base64 decode ~100 symbols/3                  32.3 ns         32.3 ns     21735283 bytes_per_second=4.61905G/s size=160
+Turbo-Base64 decode ~100 symbols/4                  27.3 ns         27.3 ns     25686471 bytes_per_second=4.64527G/s size=136
+Turbo-Base64 decode ~100 symbols/5                  37.7 ns         37.7 ns     18520478 bytes_per_second=4.64625G/s size=188
+aklomp/base64 decode ~100 symbols/3                 22.0 ns         22.0 ns     31813410 bytes_per_second=6.78648G/s size=160
+aklomp/base64 decode ~100 symbols/4                 16.9 ns         16.9 ns     41613164 bytes_per_second=7.50538G/s size=136
+aklomp/base64 decode ~100 symbols/5                 27.0 ns         26.9 ns     25983089 bytes_per_second=6.49867G/s size=188
+```
+
+#### ~200 symbols
+
+```
+Turbo-Base64 decode ~200 symbols/6                  91.2 ns         91.1 ns      7664681 bytes_per_second=4.94662G/s size=484
+Turbo-Base64 decode ~200 symbols/7                  51.5 ns         51.5 ns     13643628 bytes_per_second=4.84879G/s size=268
+Turbo-Base64 decode ~200 symbols/8                  60.9 ns         60.9 ns     11441274 bytes_per_second=4.83445G/s size=316
+aklomp/base64 decode ~200 symbols/6                 46.1 ns         46.1 ns     15133990 bytes_per_second=9.78545G/s size=484
+aklomp/base64 decode ~200 symbols/7                 27.5 ns         27.5 ns     25371603 bytes_per_second=9.07646G/s size=268
+aklomp/base64 decode ~200 symbols/8                 36.8 ns         36.8 ns     19043111 bytes_per_second=8.00135G/s size=316
+```
+
+#### ~500 symbols
+
+```
+Turbo-Base64 decode ~500 symbols/9                   221 ns          221 ns      3163113 bytes_per_second=5.11223G/s size=1.212k
+Turbo-Base64 decode ~500 symbols/10                  126 ns          126 ns      5566910 bytes_per_second=5.06455G/s size=684
+Turbo-Base64 decode ~500 symbols/11                  209 ns          209 ns      3345952 bytes_per_second=5.09972G/s size=1.144k
+aklomp/base64 decode ~500 symbols/9                  104 ns          104 ns      6769171 bytes_per_second=10.8783G/s size=1.212k
+aklomp/base64 decode ~500 symbols/10                61.9 ns         61.8 ns     11316057 bytes_per_second=10.3015G/s size=684
+aklomp/base64 decode ~500 symbols/11                97.9 ns         97.9 ns      7113677 bytes_per_second=10.8874G/s size=1.144k
+```
+
+#### Longest strings in ClickBench
+
+```
+Turbo-Base64 decode longest in ClickBench/12         478 ns          478 ns      1464389 bytes_per_second=5.04157G/s size=2.588k
+Turbo-Base64 decode longest in ClickBench/13        1880 ns         1878 ns       368850 bytes_per_second=5.13792G/s size=10.36k
+Turbo-Base64 decode longest in ClickBench/14         476 ns          476 ns      1471318 bytes_per_second=5.18594G/s size=2.648k
+aklomp/base64 decode longest in ClickBench/12        211 ns          211 ns      3306394 bytes_per_second=11.4038G/s size=2.588k
+aklomp/base64 decode longest in ClickBench/13        805 ns          804 ns       867873 bytes_per_second=11.9938G/s size=10.36k
+aklomp/base64 decode longest in ClickBench/14        207 ns          207 ns      3387698 bytes_per_second=11.9286G/s size=2.648k
 ```
 
 Dell Latitude 7490, Intel Core i7-8650U, 32GB RAM, Fedora 38 Silverblue,

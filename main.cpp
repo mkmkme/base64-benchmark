@@ -43,7 +43,7 @@ static void BM_TurboBase64Encode(benchmark::State & state)
     const auto idx = state.range(0);
     const auto input = Initializer::stringsToEncode[idx];
     const auto size = input.size();
-    state.counters["size"] = size;
+    state.counters["size"] = static_cast<double>(size);
     std::string output;
     output.resize(static_cast<std::size_t>(static_cast<long double>(size) * 1.5));
     for ([[maybe_unused]] auto iteration : state)
@@ -57,14 +57,12 @@ static void BM_TurboBase64Encode(benchmark::State & state)
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
 
-BENCHMARK(BM_TurboBase64Encode)->DenseRange(0, 14);
-
 static void BM_TurboBase64Decode(benchmark::State & state)
 {
     const auto idx = state.range(0);
     const auto input = Initializer::stringsToDecode[idx];
     const auto size = input.size();
-    state.counters["size"] = size;
+    state.counters["size"] = static_cast<double>(size);
     std::string output;
     output.resize(size);
     for ([[maybe_unused]] auto iteration : state)
@@ -78,15 +76,12 @@ static void BM_TurboBase64Decode(benchmark::State & state)
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
 
-BENCHMARK(BM_TurboBase64Decode)->DenseRange(0, 14);
-
-
 static void BM_AklompBase64Encode(benchmark::State & state)
 {
     const auto idx = state.range(0);
     const auto input = Initializer::stringsToEncode[idx];
     const auto size = input.size();
-    state.counters["size"] = size;
+    state.counters["size"] = static_cast<double>(size);
     std::string output;
     output.resize(static_cast<std::size_t>(static_cast<long double>(size) * 1.5));
     std::size_t outlen = 0;
@@ -97,14 +92,12 @@ static void BM_AklompBase64Encode(benchmark::State & state)
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
 
-BENCHMARK(BM_AklompBase64Encode)->DenseRange(0, 14);
-
 static void BM_AklompBase64Decode(benchmark::State & state)
 {
     const auto idx = state.range(0);
     const auto input = Initializer::stringsToDecode[idx];
     const auto size = input.size();
-    state.counters["size"] = size;
+    state.counters["size"] = static_cast<double>(size);
     std::string output;
     output.resize(size);
     std::size_t outlen = 0;
@@ -115,7 +108,28 @@ static void BM_AklompBase64Decode(benchmark::State & state)
     state.SetBytesProcessed(state.iterations() * static_cast<int64_t>(size));
 }
 
-BENCHMARK(BM_AklompBase64Decode)->DenseRange(0, 14);
+
+BENCHMARK(BM_TurboBase64Encode)->DenseRange(0, 2)->Name("Turbo-Base64 encode ~50 symbols");
+BENCHMARK(BM_AklompBase64Encode)->DenseRange(0, 2)->Name("aklomp/base64 encode ~50 symbols");
+BENCHMARK(BM_TurboBase64Encode)->DenseRange(3, 5)->Name("Turbo-Base64 encode ~100 symbols");
+BENCHMARK(BM_AklompBase64Encode)->DenseRange(3, 5)->Name("aklomp/base64 encode ~100 symbols");
+BENCHMARK(BM_TurboBase64Encode)->DenseRange(6, 8)->Name("Turbo-Base64 encode ~200 symbols");
+BENCHMARK(BM_AklompBase64Encode)->DenseRange(6, 8)->Name("aklomp/base64 encode ~200 symbols");
+BENCHMARK(BM_TurboBase64Encode)->DenseRange(9, 11)->Name("Turbo-Base64 encode ~500 symbols");
+BENCHMARK(BM_AklompBase64Encode)->DenseRange(9, 11)->Name("aklomp/base64 encode ~500 symbols");
+BENCHMARK(BM_TurboBase64Encode)->DenseRange(12, 14)->Name("Turbo-Base64 encode longest in ClickBench");
+BENCHMARK(BM_AklompBase64Encode)->DenseRange(12, 14)->Name("aklomp/base64 encode longest in ClickBench");
+
+BENCHMARK(BM_TurboBase64Decode)->DenseRange(0, 2)->Name("Turbo-Base64 decode ~50 symbols");
+BENCHMARK(BM_AklompBase64Decode)->DenseRange(0, 2)->Name("aklomp/base64 decode ~50 symbols");
+BENCHMARK(BM_TurboBase64Decode)->DenseRange(3, 5)->Name("Turbo-Base64 decode ~100 symbols");
+BENCHMARK(BM_AklompBase64Decode)->DenseRange(3, 5)->Name("aklomp/base64 decode ~100 symbols");
+BENCHMARK(BM_TurboBase64Decode)->DenseRange(6, 8)->Name("Turbo-Base64 decode ~200 symbols");
+BENCHMARK(BM_AklompBase64Decode)->DenseRange(6, 8)->Name("aklomp/base64 decode ~200 symbols");
+BENCHMARK(BM_TurboBase64Decode)->DenseRange(9, 11)->Name("Turbo-Base64 decode ~500 symbols");
+BENCHMARK(BM_AklompBase64Decode)->DenseRange(9, 11)->Name("aklomp/base64 decode ~500 symbols");
+BENCHMARK(BM_TurboBase64Decode)->DenseRange(12, 14)->Name("Turbo-Base64 decode longest in ClickBench");
+BENCHMARK(BM_AklompBase64Decode)->DenseRange(12, 14)->Name("aklomp/base64 decode longest in ClickBench");
 
 // clang-format off
 
